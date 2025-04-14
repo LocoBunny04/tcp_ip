@@ -240,8 +240,8 @@ int main(int argc, char *argv[]){
   //signal 
   //buffer allocate
   //File Transfer Loop
- * socket create
- * initalize server add struct
+  //create socket
+  //initalize server add struct
  * connect to server
  * check file exist and permissions
     * open file
@@ -299,6 +299,18 @@ int main(int argc, char *argv[]){
             return EXIT_FAILURE;
         }
         /* Initialize server address structure */
+        struct sockaddr_in server_addr; /* Declare the server address structure */
+        memset(&server_addr, 0, sizeof(server_addr)); /* Clear the structure */
+        server_addr.sin_family = AF_INET; /* Set address family to IPv4 */
+        server_addr.sin_port = htons((unsigned short)server_port); /* Port number */
+
+        if (inet_pton(AF_INET, server_ip, &server_addr.sin_addr) <= 0) {
+            peeror(stderr, "client: ERROR: Invalid server IP address.\n");
+            cleanup();
+            return EXIT_FAILURE;
+        }
+        /* Connect to server */
         
 
+        perror("client: ERROR: connecting to %s:%ld\n", server_ip, server_port);
 }/* End of main() */
