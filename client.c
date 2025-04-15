@@ -245,11 +245,11 @@ int main(int argc, char *argv[]){
   //connect to server
   //check file exist and permissions
     //open file
-        * read file and send to server
- * check file read errors
- * close file
-    * close socket
- * cleanup
+        // read file and send to server
+  //check file read errors
+  //close file
+    //close socket
+ // cleanup
 */ 
 /* Variables */
     char *server_ip = NULL; /* Server IP */
@@ -310,12 +310,15 @@ int main(int argc, char *argv[]){
             return EXIT_FAILURE;
         }
         /* Connect to server */
-        if (connect(curr_sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) != 0) {
+        fprintf(stderr, "client: Connecting to %s:%d...\n", server_ip, server_port);
+            if (connect(curr_sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) != 0) {
             fprintf(stderr, "client: ERROR: connecting to %s:%ld\n", server_ip, server_port);
             cleanup();
             return EXIT_FAILURE;
         }
         fprintf(stdout, "client: Success!\n");
+        fprintf(stdout, "client: Sending file \"%s\"...\n", file_name);
+
         /* Open file */
         curr_file_fd = open(file_name, O_RDONLY);
         if (curr_file_fd < 0) {
@@ -325,5 +328,35 @@ int main(int argc, char *argv[]){
             continue; /* Skip to next file */
         }
 
+        /* Read file and send to server */
+        while ((bytes_read = read(curr_fd, buffer, BUFFER_SIZE)) > 0) {
+            ssize_t total_bytes_sent = 0; /* Total bytes sent */
+            while (total_bytes_sent < bytes_read) {
+                bytes_sent = send(curr_sock_fd, buffer + total_bytes_sent, bytes_read - total_bytes_sent, 0);
+                if (bytes_sent < 0) {
+                    perror("client: ERROR: While sending data.\n");
+                    cleanup();
+                    return EXIT_FAILURE;
+                }
+                total_bytes_sent += bytes_sent; // Update the total bytes sent
+            }
+        }
+        /* Check for file read errors */
+        if (bytes_read < 0) {
+            perror("client: ERROR: Failed to read file.\n");
+        }else {
+            fprintf(stdout, "client: Done!");
+        }   
 
+        /* Close file */
+        close(curr_file_fd);
+        curr_file_fd = -1;
+        /* Close socket */
+        close(curr_sock_fd);
+        curr_sock_fd = -1;
+    }
+    /* Cleanup after yourself */   
+    fprintf(stdout, "client: File transfer(s) complete.\nclient: Goodbye!\n");
+    cleanup();
+    return EXIT_SUCCESS;
 }/* End of main() */
