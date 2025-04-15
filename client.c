@@ -243,8 +243,8 @@ int main(int argc, char *argv[]){
   //create socket
   //initalize server add struct
   //connect to server
- * check file exist and permissions
-    * open file
+  //check file exist and permissions
+    //open file
         * read file and send to server
  * check file read errors
  * close file
@@ -316,20 +316,14 @@ int main(int argc, char *argv[]){
             return EXIT_FAILURE;
         }
         fprintf(stdout, "client: Success!\n");
-        /* Check if file exists and has read permissions */
-        if(access(file_name, R_OK) != 0) {
-            fprintf(stderr, "client: ERROR: Failed to open: \"%s\"\n", file_name); 
-            close(curr_sock_fd);
-            curr_sock_fd = -1;
-            continue; /* Skip to next file */
-        }
         /* Open file */
         curr_file_fd = open(file_name, O_RDONLY);
-        if (curr_fd < 0) {
-            fprintf(stderr, "client: ERROR: Failed to open: \"%s\"\n", file_name); 
+        if (curr_file_fd < 0) {
+            fprintf(stderr, "client: ERROR: Failed to open: \"%s\"\n", file_name);
             close(curr_sock_fd);
             curr_sock_fd = -1;
             continue; /* Skip to next file */
         }
+
 
 }/* End of main() */
