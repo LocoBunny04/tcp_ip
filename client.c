@@ -242,7 +242,7 @@ int main(int argc, char *argv[]){
   //File Transfer Loop
   //create socket
   //initalize server add struct
- * connect to server
+  //connect to server
  * check file exist and permissions
     * open file
         * read file and send to server
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]){
     /* Allocate single buffer for each file transfer individually */
     buffer = (char *)malloc(BUFFER_SIZE);
     if (buffer == NULL) {
-        peeror(stderr, "client: ERROR: Failed to allocate memory.\n");
+        perror(stderr, "client: ERROR: Failed to allocate memory.\n");
         return(EXIT_FAILURE);
     }
 
@@ -305,12 +305,31 @@ int main(int argc, char *argv[]){
         server_addr.sin_port = htons((unsigned short)server_port); /* Port number */
 
         if (inet_pton(AF_INET, server_ip, &server_addr.sin_addr) <= 0) {
-            peeror(stderr, "client: ERROR: Invalid server IP address.\n");
+            perror(stderr, "client: ERROR: Invalid server IP address.\n");
             cleanup();
             return EXIT_FAILURE;
         }
         /* Connect to server */
-        
+        if (connect(curr_sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) != 0) {
+            fprintf(stderr, "client: ERROR: connecting to %s:%ld\n", server_ip, server_port);
+            cleanup();
+            return EXIT_FAILURE;
+        }
+        fprintf(stdout, "client: Success!\n");
+        /* Check if file exists and has read permissions */
+        if(access(file_name, R_OK) != 0) {
+            fprintf(stderr, "client: ERROR: Failed to open: \"%s\"\n", file_name); 
+            close(curr_sock_fd);
+            curr_sock_fd = -1;
+            continue; /* Skip to next file */
+        }
+        /* Open file */
+        curr_file_fd = open(file_name, O_RDONLY);
+        if (curr_fd < 0) {
+            fprintf(stderr, "client: ERROR: Failed to open: \"%s\"\n", file_name); 
+            close(curr_sock_fd);
+            curr_sock_fd = -1;
+            continue; /* Skip to next file */
+        }
 
-        perror("client: ERROR: connecting to %s:%ld\n", server_ip, server_port);
 }/* End of main() */
