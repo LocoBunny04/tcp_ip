@@ -38,8 +38,11 @@ void cleanup(void) {
         close(curr_sock_fd); /* Close the socket connection */
         curr_sock_fd = -1;   /* Reset socket descriptor */  
     } 
-
-    
+    /* Close the output file */
+    if (curr_fd >= 0) {
+        close(curr_fd);   /* Close the file */
+        curr_fd = -1;     /* Reset file descriptor */
+    }
 }
 
 /* SIGINT handler for client (e.g., Ctrl+C) */
@@ -125,6 +128,7 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
         fprintf(stdout, "client: Success!\n");
+        fprintf(stdout, "client: Sending file \"%s\"...\n", file_name);
 
         /* Open file */
         curr_file_fd = open(file_name, O_RDONLY);
@@ -136,11 +140,10 @@ int main(int argc, char *argv[]) {
         }
 
         /* Read file and send to server */
-        fprintf(stdout, "client: Sending: \"%s\"...\n", file_name);
         while ((bytes_read = read(curr_file_fd, buffer, BUFFER_SIZE)) > 0) {
             total_bytes_sent = 0; /* Reset total bytes sent for each read */
             while (total_bytes_sent < bytes_read) {
-                bytes_sent = send(curr_sock_fd, buffer + total_bytes_sent, bytes_read - total_bytes_sent, 0); 
+                bytes_sent = send(curr_sock_fd, buffer + total_bytes_sent, bytes_read - total_bytes_sent, 0);
                 if (bytes_sent < 0) {
                     perror("client: ERROR: While sending data.\n");
                     cleanup();
@@ -154,10 +157,10 @@ int main(int argc, char *argv[]) {
         if (bytes_read < 0) {
             perror("client: ERROR: Failed to read file.\n");
         } else {
-            fprintf(stdout, "client: Done.\n"); /* Updated message */
-}
+            fprintf(stdout, "client: Done sending \"%s\"!\n", file_name);
+        }
 
-      /* Close file */
+        /* Close file */
         close(curr_file_fd);
         curr_file_fd = -1;
         /* Close socket */
