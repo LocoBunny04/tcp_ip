@@ -28,7 +28,7 @@ int curr_sock_fd = -1; /* Current Socket file descriptor */
 int curr_fd = -1; /* Current File descriptor */
 
 /* Function Prototypes */
-void cleanup(void);
+// void cleanup(void);
 void signal_handler(int sig);
 
 void cleanup(void) {
