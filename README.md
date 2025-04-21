@@ -24,8 +24,3 @@ Client.C main() tasks:
  * close socket
  * cleanup
 */ 
-=======
-Started Coding: April 12, 2025 at 16:09  
-Upload to Github: April 12, 2025 at 22:19  
-Complete client.c: April 15, 2025 at 2:30  
->>>>>>> 6bea42289143e784338e4f91e8e8c541124c99b8
