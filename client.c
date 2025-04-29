@@ -125,6 +125,7 @@ int main(int argc, char *argv[]) {
             return EXIT_FAILURE;
         }
         fprintf(stdout, "client: Success!\n");
+        fprintf(stdout, "client: Sending: \"%s\"...\n", file_name);
 
         /* Open file */
         curr_file_fd = open(file_name, O_RDONLY);
@@ -136,7 +137,6 @@ int main(int argc, char *argv[]) {
         }
 
         /* Read file and send to server */
-        fprintf(stdout, "client: Sending: \"%s\"...\n", file_name);
         while ((bytes_read = read(curr_file_fd, buffer, BUFFER_SIZE)) > 0) {
             total_bytes_sent = 0; /* Reset total bytes sent for each read */
             while (total_bytes_sent < bytes_read) {
