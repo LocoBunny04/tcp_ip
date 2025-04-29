@@ -153,4 +153,39 @@ int main(int argc, char *argv[]) {
         err_msg("Server: ERROR: Failed to set SO_REUSEADDR option");
     }
     
+    /* Making SO_REUSEPORT optional */
+    if(setsockopt(ls_fd, SQL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) < 0){
+        fprintf("server: ERROR: Failed to set SO_REUSEPORT option\n");
+        cleanup();
+        return(EXIT_FAILURE);
+    }
+
+    /* reset server address structure */
+    memset(&rs_fd, 0, sizeof(ls_fd));
+
+    if( bind( ls_fd, (struct sockaddr *) &ls_sa, sizeof( ls_sa ) ) != 0 ) {
+        /* print bind error and exit */
+        fprintf(stderr, "server: ERROR: Failed to bind socket.\n" );
+        cleanup();
+        return(EXIT_FAILURE);
+    }
+    /* Listening for incoming connections */
+    if(listen(ls_fd, BACKLOG) < 0){
+        fprintf(stderr, "server: ERROR: listen(): Failed.\n");
+        cleanup();
+        return(EXIT_FAILURE);
+    }
+
+    /* Server Loop */
+    while(1){
+        /* receive socket socket address */
+        struct sockaddr_in rs_sa;
+        /* receive socket socket address size */
+        socklen_t rs_sa_size = sizeof( rs_sa );
+        /* bytes received counter */
+        int bytes_received;
+        printf("server: Awaiting TCP connections on port %d ... \n", port);
+
+    }
+
 }
